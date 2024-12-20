@@ -16,6 +16,11 @@ const createExpressServer = (): Express => {
     changeOrigin: true
 }));
 
+app.use('/products', createProxyMiddleware({
+  target: 'http://localhost:3002',
+  changeOrigin: true
+}));
+
   return app;
 };
 export default createExpressServer;
