@@ -1,0 +1,31 @@
+{
+  "name": "express-typescript-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --project build.tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node build/index.js",
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts",
+    "test:unit": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/supertest": "^6.0.2",
+    "nodemon": "^3.1.7",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
