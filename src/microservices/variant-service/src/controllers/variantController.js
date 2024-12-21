@@ -1,11 +1,29 @@
+const axios = require('axios');
 const Variant = require('../models/Variant');
 
-// Récupérer tous les produits
 exports.getAllVariants = async (req, res) => {
     try {
+        // Récupérer toutes les variantes depuis la base de données locale
         const variants = await Variant.findAll();
-        res.json(variants);
+        console.log('Variants récupérés :', variants);
+
+        // Récupérer tous les produits depuis le service Product
+        const productResponse = await axios.get('http://localhost:3000/products');
+        const products = productResponse.data;
+        console.log('Produit récupérés :', products);
+
+        // Associer les produits aux variantes
+        const variantsWithProducts = variants.map(variant => {
+            const product = products.find(prod => prod.id === parseInt(variant.id_product, 10));
+            return {
+                ...variant.toJSON(),
+                product: product || null, 
+            };
+        });
+
+        res.json(variantsWithProducts);
     } catch (error) {
+        console.error('Erreur lors de la récupération des variants:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des variants' });
     }
 };
@@ -14,49 +32,69 @@ exports.getAllVariants = async (req, res) => {
 exports.getVariantsById = async (req, res) => {
     const { id } = req.params;
     try {
+        // Récupérer la variante par ID
         const variant = await Variant.findByPk(id);
         if (!variant) {
-            return res.status(404).json({ error: 'Variants non trouvé' });
+            return res.status(404).json({ error: 'Variant non trouvé' });
         }
-        res.json(variant);
+
+        // Récupérer le produit associé depuis le service Product
+        const productResponse = await axios.get(`http://localhost:3000/products/${variant.id_product}`);
+        const product = productResponse.data;
+
+        // Ajouter le produit à la réponse de la variante
+        const variantWithProduct = {
+            ...variant.toJSON(),
+            product: product || null,
+        };
+
+        res.json(variantWithProduct);
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération du variant'});
+        console.error('Erreur lors de la récupération du variant:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération du variant' });
     }
 };
 
-// Créer un nouvel produit
+// Créer un nouveau variant
 exports.createVariant = async (req, res) => {
-    const { name, description } = req.body;
+    const { id_product, size, color, price, stock, name } = req.body;
     try {
-        const newVariant = await Variant.create({ name, description });
+        const newVariant = await Variant.create({ id_product, size, color, price, stock, name });
         res.status(201).json({ message: 'Variant créé', variant: newVariant });
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la création du produit' });
+        res.status(500).json({ error: 'Erreur lors de la création du variant' });
     }
 };
 
-// Modifier un produit
+
+// Modifier une variante
 exports.updateVariant = async (req, res) => {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, size, color, price, stock, id_product } = req.body;
     try {
         const variant = await Variant.findByPk(id);
         if (!variant) {
             return res.status(404).json({ error: 'Variant non trouvé' });
         }
 
+        // Mise à jour des champs
         variant.name = name || variant.name;
-        variant.description = description || variant.description;
+        variant.size = size || variant.size;
+        variant.color = color || variant.color;
+        variant.price = price || variant.price;
+        variant.stock = stock || variant.stock;
+        variant.id_product = id_product || variant.id_product;
 
         await variant.save();
 
         res.json({ message: 'Variant mis à jour', variant });
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la mise à jour du Variant' });
+        console.error('Erreur lors de la mise à jour du variant:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du variant' });
     }
 };
 
-// Supprimer un produit
+// Supprimer une variante
 exports.deleteVariant = async (req, res) => {
     const { id } = req.params;
     try {
@@ -69,6 +107,7 @@ exports.deleteVariant = async (req, res) => {
 
         res.json({ message: 'Variant supprimé' });
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la suppression du Variant' });
+        console.error('Erreur lors de la suppression du variant:', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du variant' });
     }
 };

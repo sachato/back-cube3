@@ -9,7 +9,7 @@ const Variant = sequelize.define('Variant', {
         primaryKey: true,
     },
     id_product: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     size: {
