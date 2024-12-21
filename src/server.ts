@@ -21,6 +21,11 @@ app.use('/products', createProxyMiddleware({
   changeOrigin: true
 }));
 
+app.use('/variants', createProxyMiddleware({
+  target: 'http://localhost:3003',
+  changeOrigin: true
+}));
+
   return app;
 };
 export default createExpressServer;
