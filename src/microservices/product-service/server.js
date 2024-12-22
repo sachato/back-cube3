@@ -16,7 +16,10 @@ sequelize.sync().then(() => {
 app.use(express.json());
 
 const productRoutes = require('./src/routes/productRoutes');
+const variantRoutes = require('./src/routes/variantRoutes');
+app.use('/variants', variantRoutes);
 app.use('/', productRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Service de gestion des produit sur http://localhost:${PORT}`);

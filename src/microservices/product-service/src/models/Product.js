@@ -1,12 +1,13 @@
+// Modèle Product
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Product = sequelize.define('Product', {
     id: {
         type: DataTypes.INTEGER,
-        autoIncrement: true, 
-        primaryKey: true,     
+        autoIncrement: true,
         allowNull: false,
+        primaryKey: true,
     },
     name: {
         type: DataTypes.STRING,
@@ -17,8 +18,8 @@ const Product = sequelize.define('Product', {
         allowNull: false,
     },
 }, {
-    tableName: 'Products', 
-    timestamps: true,  
+    tableName: 'Products',
+    timestamps: true,
 });
 
 module.exports = Product;

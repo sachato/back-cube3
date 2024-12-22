@@ -1,16 +1,24 @@
+// Modèle Variant
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Product = require('./Product');
 
 const Variant = sequelize.define('Variant', {
     id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true,
     },
     id_product: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: Product,
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
     },
     size: {
         type: DataTypes.STRING,
@@ -34,9 +42,11 @@ const Variant = sequelize.define('Variant', {
         allowNull: false,
     },
 }, {
-    tableName: 'Variants', 
-    timestamps: true, 
+    tableName: 'Variants',
+    timestamps: true,
 });
 
+Variant.belongsTo(Product, { foreignKey: 'id_product', as: 'product' });
+Product.hasMany(Variant, { foreignKey: 'id_product', as: 'variants' });
 
 module.exports = Variant;

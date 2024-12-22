@@ -17,4 +17,6 @@ router.put('/:id', productController.updateProduct);
 // Supprimer un utilisateur
 router.delete('/:id', productController.deleteProduct);
 
+
+
 module.exports = router;

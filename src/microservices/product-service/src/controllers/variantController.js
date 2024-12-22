@@ -1,54 +1,42 @@
-const axios = require('axios');
 const Variant = require('../models/Variant');
+const Product = require('../models/Product');
 
+// Récupérer toutes les variantes
 exports.getAllVariants = async (req, res) => {
+    console.log('jidonklds')
     try {
-        // Récupérer toutes les variantes depuis la base de données locale
-        const variants = await Variant.findAll();
-        console.log('Variants récupérés :', variants);
-
-        // Récupérer tous les produits depuis le service Product
-        const productResponse = await axios.get('http://localhost:3000/products');
-        const products = productResponse.data;
-        console.log('Produit récupérés :', products);
-
-        // Associer les produits aux variantes
-        const variantsWithProducts = variants.map(variant => {
-            const product = products.find(prod => prod.id === parseInt(variant.id_product, 10));
-            return {
-                ...variant.toJSON(),
-                product: product || null, 
-            };
+        const variants = await Variant.findAll({
+            include: [{
+                model: Product,
+                as: 'product',
+                attributes: ['id', 'name', 'description'],
+            }],
         });
 
-        res.json(variantsWithProducts);
+        res.json(variants);
     } catch (error) {
         console.error('Erreur lors de la récupération des variants:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des variants' });
     }
 };
 
-// Récupérer un produit par ID
+// Récupérer une variante par ID
 exports.getVariantsById = async (req, res) => {
     const { id } = req.params;
     try {
-        // Récupérer la variante par ID
-        const variant = await Variant.findByPk(id);
+        const variant = await Variant.findByPk(id, {
+            include: [{
+                model: Product,
+                as: 'product',
+                attributes: ['id', 'name', 'description'],
+            }],
+        });
+
         if (!variant) {
             return res.status(404).json({ error: 'Variant non trouvé' });
         }
 
-        // Récupérer le produit associé depuis le service Product
-        const productResponse = await axios.get(`http://localhost:3000/products/${variant.id_product}`);
-        const product = productResponse.data;
-
-        // Ajouter le produit à la réponse de la variante
-        const variantWithProduct = {
-            ...variant.toJSON(),
-            product: product || null,
-        };
-
-        res.json(variantWithProduct);
+        res.json(variant);
     } catch (error) {
         console.error('Erreur lors de la récupération du variant:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération du variant' });
@@ -62,10 +50,10 @@ exports.createVariant = async (req, res) => {
         const newVariant = await Variant.create({ id_product, size, color, price, stock, name });
         res.status(201).json({ message: 'Variant créé', variant: newVariant });
     } catch (error) {
+        console.error('Erreur lors de la création du variant:', error);
         res.status(500).json({ error: 'Erreur lors de la création du variant' });
     }
 };
-
 
 // Modifier une variante
 exports.updateVariant = async (req, res) => {
