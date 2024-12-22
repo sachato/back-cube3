@@ -17,8 +17,11 @@ app.use(express.json());
 
 const productRoutes = require('./src/routes/productRoutes');
 const variantRoutes = require('./src/routes/variantRoutes');
+const categorieRoutes = require('./src/routes/categorieRoute');
+
+app.use('/categories', categorieRoutes);
 app.use('/variants', variantRoutes);
-app.use('/', productRoutes);
+app.use('/products', productRoutes);
 
 
 app.listen(PORT, () => {
