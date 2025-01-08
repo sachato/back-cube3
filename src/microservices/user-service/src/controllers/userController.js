@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Global = require('../utils/helpers')
 
 // Récupérer tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
@@ -27,10 +28,14 @@ exports.getUserById = async (req, res) => {
 // Créer un nouvel utilisateur
 exports.createUser = async (req, res) => {
     const { firstname, lastname, email, password, phone_number } = req.body;
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    const hash_password = await Global.hashPassword(password);
+    console.log("hash", hash_password);
     try {
-        const newUser = await User.create({ firstname, lastname, email, password, phone_number });
+        const newUser = await User.create({ firstname, lastname, email, password: hash_password, phone_number });
         res.status(201).json({ message: 'Utilisateur créé', user: newUser });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Erreur lors de la création de l’utilisateur' });
     }
 };
@@ -38,7 +43,7 @@ exports.createUser = async (req, res) => {
 // Modifier un utilisateur
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { firstname, lastname, email, password, phone_number } = req.body;
+    const { firstname, lastname, email, phone_number } = req.body;
     try {
         const user = await User.findByPk(id);
         if (!user) {
@@ -73,5 +78,32 @@ exports.deleteUser = async (req, res) => {
         res.json({ message: 'Utilisateur supprimé' });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la suppression de l’utilisateur' });
+    }
+};
+
+
+exports.loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        // Récupérez le hash du mot de passe enregistré depuis la base de données
+
+        const user = await User.findOne({
+            where: { email }, // Recherche l'utilisateur par son username
+            attributes: ['id', 'password',  'email', 'createdAt'], // Sélectionnez uniquement les champs nécessaires
+        });
+        const hashedPassword = user.password;
+
+        console.log(hashedPassword);
+
+        const isMatch = await Global.verifyPassword(password, hashedPassword);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Mot de passe incorrect' });
+        }
+
+        res.json({ message: 'Connexion réussie', email });
+    } catch (error) {
+        console.error('Erreur lors de la vérification du mot de passe :', error);
+        res.status(500).json({ error: 'Erreur lors de la connexion' });
     }
 };
