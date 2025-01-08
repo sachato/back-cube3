@@ -1,8 +1,7 @@
-// Modèle Categorie
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Categorie = sequelize.define('Categorie', {
+const Categories = sequelize.define('Categories', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -14,8 +13,14 @@ const Categorie = sequelize.define('Categorie', {
         allowNull: false,
     },
 }, {
-    tableName: 'Caterogie',
+    tableName: 'Categories',
     timestamps: true,
 });
 
-module.exports = Categorie;
+// Relation unidirectionnelle : Categories → ProductsCategories
+Categories.hasMany(require('./ProductsCategories'), {
+    foreignKey: 'id_categorie',
+    as: 'categoryProducts',
+});
+
+module.exports = Categories;

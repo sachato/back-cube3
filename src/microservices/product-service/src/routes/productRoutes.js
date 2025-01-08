@@ -17,6 +17,10 @@ router.put('/:id', productController.updateProduct);
 // Supprimer un utilisateur
 router.delete('/:id', productController.deleteProduct);
 
+router.get('/productsbycategory/:id', productController.getProductsByCategory);
+
+router.get('/getallvariantbyproductid/:id', productController.getVariantsByProduct);
+
 
 
 module.exports = router;

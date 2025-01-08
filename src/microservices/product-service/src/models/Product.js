@@ -1,4 +1,3 @@
-// Modèle Product
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -15,11 +14,17 @@ const Product = sequelize.define('Product', {
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
 }, {
     tableName: 'Products',
     timestamps: true,
+});
+
+// Relation unidirectionnelle : Product → ProductsCategories
+Product.hasMany(require('./ProductsCategories'), {
+    foreignKey: 'id_product',
+    as: 'productCategories',
 });
 
 module.exports = Product;

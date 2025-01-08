@@ -1,9 +1,9 @@
 const Variant = require('../models/Variant');
 const Product = require('../models/Product');
+const Global = require('../utils/helpers');
 
 // Récupérer toutes les variantes
 exports.getAllVariants = async (req, res) => {
-    console.log('jidonklds')
     try {
         const variants = await Variant.findAll({
             include: [{
@@ -46,8 +46,9 @@ exports.getVariantsById = async (req, res) => {
 // Créer un nouveau variant
 exports.createVariant = async (req, res) => {
     const { id_product, size, color, price, stock, name } = req.body;
+    const id = Global.generateGUID();
     try {
-        const newVariant = await Variant.create({ id_product, size, color, price, stock, name });
+        const newVariant = await Variant.create({ id, id_product, size, color, price, stock, name });
         res.status(201).json({ message: 'Variant créé', variant: newVariant });
     } catch (error) {
         console.error('Erreur lors de la création du variant:', error);

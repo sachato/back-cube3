@@ -46,7 +46,5 @@ const Variant = sequelize.define('Variant', {
     timestamps: true,
 });
 
-Variant.belongsTo(Product, { foreignKey: 'id_product', as: 'product' });
-Product.hasMany(Variant, { foreignKey: 'id_product', as: 'variants' });
 
 module.exports = Variant;
