@@ -2,6 +2,7 @@ const sequelize = require('../config/database');
 const Product = require('./Product');
 const Categories = require('./Categorie');
 const Variant = require('./Variant');
+const Picture = require('./Picture');
 const ProductsCategories = require('./ProductsCategories');
 
 Product.hasMany(Variant, {
@@ -39,10 +40,22 @@ ProductsCategories.belongsTo(Categories, {
     as: 'categorie', // Alias pour accéder à la catégorie
 });
 
+// Relation : Un variant peut avoir plusieurs photos
+Variant.hasMany(Picture, {
+    foreignKey: 'id_variant',
+    as: 'pictures', // Alias pour accéder aux photos d'un variant
+});
+
+// Relation : Une photo appartient à un seul variant
+Picture.belongsTo(Variant, {
+    foreignKey: 'id_variant',
+    as: 'variant', // Alias pour accéder au variant d'une photo
+});
 module.exports = {
     sequelize,
     Product,
     Categories,
     ProductsCategories,
     Variant,
+    Picture,
 };

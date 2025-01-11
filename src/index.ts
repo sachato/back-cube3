@@ -6,7 +6,7 @@ const { Product, Categories, ProductsCategories } = require('./microservices/pro
 const app = createExpressServer();
 const port = process.env.PORT || 3000;
 
-sequelize.sync({ alter: true }) // `alter: true` met à jour les tables sans les recréer (évite la perte de données)
+sequelize.sync({ force: true }) // `alter: true` met à jour les tables sans les recréer (évite la perte de données)
     .then(() => {
         console.log('Base de données synchronisée');
         // Démarrer le serveur une fois la base synchronisée

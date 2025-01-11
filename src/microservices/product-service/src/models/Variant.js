@@ -5,8 +5,7 @@ const Product = require('./Product');
 
 const Variant = sequelize.define('Variant', {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.CHAR(36),
         allowNull: false,
         primaryKey: true,
     },

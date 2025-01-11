@@ -19,11 +19,13 @@ const productRoutes = require('./src/routes/productRoutes');
 const variantRoutes = require('./src/routes/variantRoutes');
 const categorieRoutes = require('./src/routes/categorieRoute');
 const productsCategoriesRoutes = require('./src/routes/productsCategoriesRoutes');
+const pictureRoute = require('./src/routes/picturesRoute');
 
 app.use('/categories', categorieRoutes);
 app.use('/variants', variantRoutes);
 app.use('/products', productRoutes);
 app.use('/products-categories', productsCategoriesRoutes);
+app.use('/pictures',pictureRoute);
 
 
 
