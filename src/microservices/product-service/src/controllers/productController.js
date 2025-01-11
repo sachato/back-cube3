@@ -54,8 +54,15 @@ exports.getProductByName = async (req, res) => {
 
 // Récupérer tous les produits
 exports.getAllProducts = async (req, res) => {
+    const { page = 1, pageSize = 5 } = req.query; // Récupérer les paramètres de pagination depuis la requête
+
+    const limit = parseInt(pageSize, 10);
+    const offset = (parseInt(page, 10) - 1) * limit;
     try {
-        const products = await Product.findAll();
+        const products = await Product.findAll({
+            limit,
+            offset,
+        });
         res.json(products);
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des produits' });
