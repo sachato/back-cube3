@@ -1,7 +1,56 @@
+const { Op } = require('sequelize');
 const Product = require('../models/Product');
 const Categories = require('../models/Categorie');
 const ProductsCategories = require('../models/ProductsCategories');
 const Variant = require('../models/Variant');
+
+
+exports.getLatest = async (req, res) => {
+    console.log("getLatest")
+    const { page = 1, pageSize = 5 } = req.query; 
+    const limit = parseInt(pageSize, 10);
+    const offset = (parseInt(page, 10) - 1) * limit;
+
+    try {
+        const products = await Product.findAll({
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset,
+        });
+        console.log(products);
+        res.json(products);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des derniers produits :', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des derniers produits' });
+    }
+};
+
+exports.getProductByName = async (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({ error: 'Le paramètre "name" est requis' });
+    }
+
+    try {
+        const products = await Product.findAll({
+            where: {
+                name: {
+                    [Op.like]: `%${name}%`, // Recherche partielle par nom
+                },
+            },
+        });
+
+        if (products.length === 0) {
+            return res.status(404).json({ error: 'Aucun produit trouvé' });
+        }
+
+        res.json(products);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des produits par nom :', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des produits par nom' });
+    }
+};
 
 // Récupérer tous les produits
 exports.getAllProducts = async (req, res) => {
@@ -15,6 +64,7 @@ exports.getAllProducts = async (req, res) => {
 
 // Récupérer un produit par ID
 exports.getProductsById = async (req, res) => {
+    console.log("getProductsById")
     const { id } = req.params;
     try {
         const product = await Product.findByPk(id);
@@ -40,6 +90,7 @@ exports.createProduct = async (req, res) => {
 
 // Modifier un produit
 exports.updateProduct = async (req, res) => {
+    console.log("updateProduct")
     const { id } = req.params;
     const { name, description } = req.body;
     try {
@@ -61,6 +112,7 @@ exports.updateProduct = async (req, res) => {
 
 // Supprimer un produit
 exports.deleteProduct = async (req, res) => {
+    console.log("deleteProduct")
     const { id } = req.params;
     try {
         const product = await Product.findByPk(id);
@@ -112,6 +164,7 @@ exports.getProductsByCategory = async (req, res) => {
 };
 
 exports.getVariantsByProduct = async (req, res) => {
+    console.log("getVariantsByProduct")
     const { id } = req.params; // ID du produit
     try {
         const product = await Product.findByPk(id, {
@@ -140,3 +193,5 @@ exports.getVariantsByProduct = async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la récupération des variants' });
     }
 };
+
+
