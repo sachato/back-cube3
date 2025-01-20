@@ -54,20 +54,57 @@ exports.getProductByName = async (req, res) => {
 
 // Récupérer tous les produits
 exports.getAllProducts = async (req, res) => {
-    const { page = 1, pageSize = 5 } = req.query; // Récupérer les paramètres de pagination depuis la requête
+    const { page = 1, pageSize = 5, name, categoryId } = req.query;
 
-    const limit = parseInt(pageSize, 10);
-    const offset = (parseInt(page, 10) - 1) * limit;
+    // Validation des paramètres
+    const limit = Math.max(1, parseInt(pageSize, 10) || 5);
+    const offset = Math.max(0, (parseInt(page, 10) - 1) * limit);
+
+    const whereConditions = {};
+    if (name) {
+        whereConditions.name = {
+            [Op.like]: `%${name}%`,
+        };
+    }
+
     try {
         const products = await Product.findAll({
+            where: whereConditions,
+            include: categoryId
+                ? [{
+                    model: ProductsCategories,
+                    as: 'productCategoryRelations',
+                    include: {
+                        model: Categories,
+                        as: 'categorie',
+                        where: { id: categoryId }, // Filtre par catégorie
+                    },
+                }]
+                : [],
             limit,
             offset,
         });
-        res.json(products);
+
+        if (!products || products.length === 0) {
+            return res.status(404).json({ error: 'Aucun produit trouvé' });
+        }
+
+        // Reformater la réponse pour un format simplifié
+        const formattedProducts = products.map((product) => ({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt,
+        }));
+
+        res.json(formattedProducts);
     } catch (error) {
+        console.error('Erreur lors de la récupération des produits :', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des produits' });
     }
 };
+
 
 // Récupérer un produit par ID
 exports.getProductsById = async (req, res) => {
